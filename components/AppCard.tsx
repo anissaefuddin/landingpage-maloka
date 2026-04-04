@@ -2,15 +2,37 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ExternalLink, Clock, Gauge, ArrowUpRight } from "lucide-react";
+import {
+  ExternalLink,
+  Clock,
+  Gauge,
+  ArrowUpRight,
+  Globe,
+  Smartphone,
+  Server,
+  Lock,
+  MessageCircle,
+  FileText,
+} from "lucide-react";
+
+export type AppType = "web" | "mobile" | "api" | "internal";
 
 export type AppItem = {
   name: string;
   image: string;
   url: string;
+  type: AppType;
+  description?: string;
 };
 
 export type AppStatus = "loading" | "active" | "inactive";
+
+const typeConfig: Record<AppType, { label: string; icon: typeof Globe; color: string; cta: string }> = {
+  web: { label: "Web App", icon: Globe, color: "#3b82f6", cta: "Open App" },
+  mobile: { label: "Mobile App", icon: Smartphone, color: "#8b5cf6", cta: "Try via Contact" },
+  api: { label: "API", icon: Server, color: "#06b6d4", cta: "View Docs" },
+  internal: { label: "Internal", icon: Lock, color: "#6b7280", cta: "Private" },
+};
 
 /* ───────────────────── Featured Card (large) ───────────────────── */
 
@@ -20,31 +42,62 @@ type FeaturedCardProps = {
   responseTime?: number;
   checkedAt?: string;
   uptime?: string;
+  onMobileClick?: () => void;
 };
 
-export function FeaturedCard({ app, status, responseTime, checkedAt, uptime }: FeaturedCardProps) {
+export function FeaturedCard({ app, status, responseTime, checkedAt, uptime, onMobileClick }: FeaturedCardProps) {
+  const cfg = typeConfig[app.type];
+  const TypeIcon = cfg.icon;
+  const isClickable = app.type === "web" || app.type === "api";
+  const isMobile = app.type === "mobile";
+  const isInternal = app.type === "internal";
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isMobile) {
+      e.preventDefault();
+      onMobileClick?.();
+    }
+    if (isInternal) {
+      e.preventDefault();
+    }
+  };
+
+  const ctaIcon = (() => {
+    switch (app.type) {
+      case "web": return <ArrowUpRight size={18} className="text-white" />;
+      case "mobile": return <MessageCircle size={18} className="text-white" />;
+      case "api": return <FileText size={18} className="text-white" />;
+      case "internal": return <Lock size={18} className="text-white/50" />;
+    }
+  })();
+
   return (
     <motion.div
       animate={{ y: [0, -4, 0] }}
       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
     >
     <AnimatePresence mode="wait">
-      <motion.a
+      <motion.div
         key={app.url}
-        href={app.url}
-        target="_blank"
-        rel="noopener noreferrer"
+        role={isClickable ? "link" : "button"}
+        onClick={(e) => {
+          if (isClickable) {
+            window.open(app.url, "_blank", "noopener,noreferrer");
+          } else {
+            handleClick(e);
+          }
+        }}
         initial={{ opacity: 0, y: 16, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -16, scale: 0.97 }}
         transition={{ duration: 0.35, type: "spring", bounce: 0.2 }}
-        whileHover={{ scale: 1.01 }}
-        className="group relative block h-full w-full overflow-hidden rounded-3xl border shadow-lg transition-shadow duration-300 hover:shadow-2xl"
+        whileHover={{ scale: isInternal ? 1 : 1.01 }}
+        className={`group relative block h-full w-full overflow-hidden rounded-3xl border shadow-lg transition-shadow duration-300 ${isInternal ? "cursor-default opacity-80" : "cursor-pointer hover:shadow-2xl"}`}
         style={{
           background: "var(--card-bg)",
           borderColor: "var(--card-border)",
         }}
-        data-clickable
+        data-clickable={!isInternal ? true : undefined}
       >
         {/* Image area */}
         <div className="relative aspect-[16/9] w-full overflow-hidden">
@@ -70,7 +123,14 @@ export function FeaturedCard({ app, status, responseTime, checkedAt, uptime }: F
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
           {/* Status badge — top right */}
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <div
+              className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md"
+              style={{ background: `${cfg.color}30`, color: cfg.color }}
+            >
+              <TypeIcon size={11} />
+              {cfg.label}
+            </div>
             <StatusBadge status={status} />
           </div>
 
@@ -101,19 +161,26 @@ export function FeaturedCard({ app, status, responseTime, checkedAt, uptime }: F
               >
                 {app.name}
               </h3>
-              <p className="mt-1 text-sm text-white/70">
-                {app.url.replace(/^https?:\/\//, "")}
+              <p className="mt-1 truncate max-w-[260px] text-sm text-white/70">
+                {app.type === "internal"
+                  ? "Private Access"
+                  : app.type === "mobile"
+                    ? "Mobile Application"
+                    : app.url.replace(/^https?:\/\//, "").split("/")[0]}
               </p>
             </div>
             <motion.div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm"
-              whileHover={{ scale: 1.15, backgroundColor: "rgba(255,255,255,0.35)" }}
+              className="flex shrink-0 items-center gap-2 rounded-full bg-white/20 px-4 py-2.5 backdrop-blur-sm"
+              whileHover={isInternal ? {} : { scale: 1.05, backgroundColor: "rgba(255,255,255,0.35)" }}
             >
-              <ArrowUpRight size={18} className="text-white" />
+              {ctaIcon}
+              <span className={`text-sm font-semibold ${isInternal ? "text-white/50" : "text-white"}`}>
+                {cfg.cta}
+              </span>
             </motion.div>
           </div>
         </div>
-      </motion.a>
+      </motion.div>
     </AnimatePresence>
     </motion.div>
   );
@@ -129,6 +196,9 @@ type TabThumbProps = {
 };
 
 export function TabThumb({ app, status, isActive, onClick }: TabThumbProps) {
+  const cfg = typeConfig[app.type];
+  const TypeIcon = cfg.icon;
+
   return (
     <motion.button
       onClick={onClick}
@@ -155,7 +225,18 @@ export function TabThumb({ app, status, isActive, onClick }: TabThumbProps) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{app.name}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="truncate text-sm font-semibold">{app.name}</p>
+          <span
+            className="shrink-0 rounded px-1 py-0.5 text-[9px] font-bold uppercase leading-none"
+            style={{
+              background: isActive ? "rgba(255,255,255,0.2)" : `${cfg.color}20`,
+              color: isActive ? "#fff" : cfg.color,
+            }}
+          >
+            {cfg.label}
+          </span>
+        </div>
         <div className="flex items-center gap-1.5">
           <StatusDot status={status} small />
           <span

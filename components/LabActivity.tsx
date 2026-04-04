@@ -4,48 +4,12 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import { ChevronUp, ChevronDown, RefreshCw } from "lucide-react";
 import { FeaturedCard, TabThumb, type AppItem } from "./AppCard";
+import MobileAppModal from "./MobileAppModal";
+import { apps } from "@/lib/apps";
 
 const AUTO_ADVANCE_MS = 6000;
 const REFRESH_INTERVAL_MS = 30000;
 const MAX_VISIBLE_TABS = 5;
-
-const apps: AppItem[] = [
-  {
-    name: "Knowledge Platform",
-    image: "/images/knowledge.svg",
-    url: "https://knowledge.maloka.app",
-  },
-  {
-    name: "Agro System",
-    image: "/images/agro.svg",
-    url: "https://agro.maloka.app",
-  },
-  {
-    name: "RIMS",
-    image: "/images/rims.svg",
-    url: "https://rims.maloka.app",
-  },
-  {
-    name: "Knowledge Platform 2",
-    image: "/images/knowledge.svg",
-    url: "https://knowledge2.maloka.app",
-  },
-  {
-    name: "API System",
-    image: "/images/api.svg",
-    url: "https://api.maloka.app",
-  },
-  {
-    name: "API System 2",
-    image: "/images/api.svg",
-    url: "https://api2.maloka.app",
-  },
-  {
-    name: "API System 3",
-    image: "/images/api.svg",
-    url: "https://api3.maloka.app",
-  },
-];
 
 type AppStatus = "loading" | "active" | "inactive";
 
@@ -75,6 +39,7 @@ export default function LabActivity() {
   const [paused, setPaused] = useState(false);
   const [cardHeight, setCardHeight] = useState<number | undefined>(undefined);
   const [refreshing, setRefreshing] = useState(false);
+  const [mobileModalApp, setMobileModalApp] = useState<AppItem | null>(null);
   const [statuses, setStatuses] = useState<StatusMap>(() => {
     const initial: StatusMap = {};
     apps.forEach((app) => {
@@ -90,7 +55,11 @@ export default function LabActivity() {
 
   const activeCount = Object.values(statuses).filter((s) => s.status === "active").length;
   const isChecking = Object.values(statuses).some((s) => s.status === "loading");
-  const needsScroll = apps.length > MAX_VISIBLE_TABS;
+  const [needsScroll, setNeedsScroll] = useState(false);
+
+  useEffect(() => {
+    setNeedsScroll(apps.length > MAX_VISIBLE_TABS);
+  }, []);
 
   // Check statuses via API route
   const checkAllStatuses = useCallback(async (silent = false) => {
@@ -198,8 +167,9 @@ export default function LabActivity() {
     el.scrollBy({ top: dir === "up" ? -thumbH - 12 : thumbH + 12, behavior: "smooth" });
   };
 
+  const defaultStatus: StatusInfo = { status: "loading", responseTime: -1, checkedAt: "", uptime: "99.9%" };
   const currentApp = apps[activeIndex];
-  const currentStatus = statuses[currentApp.url];
+  const currentStatus = statuses[currentApp.url] ?? defaultStatus;
 
   return (
     <section id="lab-status" ref={sectionRef} className="noise-overlay relative overflow-hidden px-6 py-24 md:py-32">
@@ -325,7 +295,7 @@ export default function LabActivity() {
                 <div key={app.url} className="shrink-0 md:shrink">
                   <TabThumb
                     app={app}
-                    status={statuses[app.url].status}
+                    status={(statuses[app.url] ?? defaultStatus).status}
                     isActive={i === activeIndex}
                     onClick={() => setActiveIndex(i)}
                   />
@@ -360,6 +330,7 @@ export default function LabActivity() {
               responseTime={currentStatus.responseTime}
               checkedAt={currentStatus.checkedAt}
               uptime={currentStatus.uptime}
+              onMobileClick={() => setMobileModalApp(currentApp)}
             />
           </div>
         </motion.div>
@@ -381,6 +352,13 @@ export default function LabActivity() {
           )}
         </motion.div>
       </div>
+
+      {/* Mobile app modal */}
+      <MobileAppModal
+        app={mobileModalApp}
+        open={mobileModalApp !== null}
+        onClose={() => setMobileModalApp(null)}
+      />
     </section>
   );
 }

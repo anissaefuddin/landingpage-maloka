@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Mail, MessageCircle, Rocket, Handshake } from "lucide-react";
+import { CONTACT_EMAIL, EMAIL_URL, WA_URL, WA_DISPLAY } from "@/lib/contact";
 
 export default function CTA() {
   const ref = useRef<HTMLElement>(null);
@@ -74,7 +75,7 @@ export default function CTA() {
           className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
           <motion.a
-            href="mailto:hello@maloka.app"
+            href={EMAIL_URL}
             className="ripple inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-semibold text-white shadow-lg"
             style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary))" }}
             whileHover={{ scale: 1.06, y: -3, boxShadow: "0 10px 40px rgba(124,58,237,0.4)" }}
@@ -85,7 +86,7 @@ export default function CTA() {
           </motion.a>
 
           <motion.a
-            href="https://wa.me/6285641542123"
+            href={WA_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="ripple inline-flex items-center gap-2 rounded-full border-2 px-8 py-4 text-base font-semibold transition-colors duration-300 hover:bg-[var(--accent)] hover:text-white"
@@ -125,16 +126,16 @@ export default function CTA() {
           className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-8"
         >
           <motion.a
-            href="mailto:hello@maloka.app"
+            href={EMAIL_URL}
             className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all"
             style={{ color: "var(--muted)", borderColor: "var(--card-border)", background: "var(--card-bg)" }}
             whileHover={{ scale: 1.05, y: -2 }}
           >
             <Mail size={14} />
-            hello@maloka.app
+            {CONTACT_EMAIL}
           </motion.a>
           <motion.a
-            href="https://wa.me/6285641542123"
+            href={WA_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all"
@@ -142,7 +143,7 @@ export default function CTA() {
             whileHover={{ scale: 1.05, y: -2 }}
           >
             <MessageCircle size={14} />
-            +62 856-4154-2123
+            {WA_DISPLAY}
           </motion.a>
         </motion.div>
 

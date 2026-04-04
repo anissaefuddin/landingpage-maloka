@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback } from "react";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Sparkles, ArrowDown, Activity, Zap } from "lucide-react";
+import { APP_COUNT } from "@/lib/apps";
 
 /* ── Magnetic Button ── */
 function MagneticButton({
@@ -207,7 +208,7 @@ export default function HeroPlayground() {
               />
               <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "var(--badge-text)" }} />
             </span>
-            6 Systems Running
+            {APP_COUNT} {APP_COUNT === 1 ? "System" : "Systems"} Running
           </div>
           <div
             className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"

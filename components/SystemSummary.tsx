@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import { Terminal, GitBranch, Cpu, Globe, Database, Shield, Radio } from "lucide-react";
+import { APP_COUNT } from "@/lib/apps";
 
 /* ── count-up hook ── */
 function useCountUp(end: number, duration: number, start: boolean) {
@@ -58,7 +59,7 @@ const stats: {
   color: string;
   trend?: string;
 }[] = [
-  { icon: Globe, end: 6, suffix: "+", label: "Apps Deployed", color: "var(--primary)", trend: "+2 this month" },
+  { icon: Globe, end: APP_COUNT, label: "Apps Deployed", color: "var(--primary)", trend: "Live systems" },
   { icon: Database, end: 3, label: "Active Databases", color: "var(--secondary)", trend: "All healthy" },
   { icon: GitBranch, end: 100, suffix: "+", label: "Git Commits", color: "var(--accent)", trend: "+15 this week" },
   { icon: Shield, end: 99, suffix: ".9%", label: "Uptime Target", color: "var(--accent-alt)", trend: "On track" },
