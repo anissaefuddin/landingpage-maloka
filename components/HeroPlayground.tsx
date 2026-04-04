@@ -1,9 +1,32 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Sparkles, ArrowDown, Activity, Zap } from "lucide-react";
 import { APP_COUNT } from "@/lib/apps";
+
+/* ── Animated counter for hero badges ── */
+function useHeroCountUp(end: number, duration = 1200) {
+  const [val, setVal] = useState(0);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), 600); // delay until badges visible
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (!started) return;
+    let raf: number;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - t0) / duration, 1);
+      setVal(Math.round((1 - Math.pow(1 - p, 3)) * end));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [end, duration, started]);
+  return val;
+}
 
 /* ── Magnetic Button ── */
 function MagneticButton({
@@ -45,7 +68,7 @@ function MagneticButton({
       onMouseLeave={handleLeave}
       animate={{ x: offset.x, y: offset.y }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.97 }}
       className={className}
       style={style}
       data-clickable
@@ -72,6 +95,8 @@ export default function HeroPlayground() {
   const containerRef = useRef<HTMLElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const systemCount = useHeroCountUp(APP_COUNT, 1000);
+  const experimentCount = useHeroCountUp(2, 800);
 
   const springX = useSpring(mouseX, { damping: 40, stiffness: 150 });
   const springY = useSpring(mouseY, { damping: 40, stiffness: 150 });
@@ -184,10 +209,21 @@ export default function HeroPlayground() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mx-auto mb-8 max-w-xl text-base leading-relaxed md:text-xl"
+          className="mx-auto mb-3 max-w-xl text-base leading-relaxed md:text-xl"
           style={{ color: "var(--muted)" }}
         >
           A living lab where real systems are built, deployed, and continuously evolving.
+        </motion.p>
+
+        {/* Microcopy positioning boost */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mx-auto mb-8 text-xs font-semibold uppercase tracking-[0.2em] md:text-sm"
+          style={{ color: "var(--accent)" }}
+        >
+          Real systems. Real deployments. Real impact.
         </motion.p>
 
         {/* Proof indicators */}
@@ -201,21 +237,21 @@ export default function HeroPlayground() {
             className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium md:px-4 md:text-sm"
             style={{ background: "var(--badge-bg)", color: "var(--badge-text)" }}
           >
-            <span className="relative flex h-2 w-2">
+            <span className="relative flex h-2.5 w-2.5">
               <span
-                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                style={{ background: "var(--badge-text)" }}
+                className="absolute inline-flex h-full w-full rounded-full opacity-75"
+                style={{ background: "var(--badge-text)", animation: "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite" }}
               />
-              <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "var(--badge-text)" }} />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: "var(--badge-text)" }} />
             </span>
-            {APP_COUNT} {APP_COUNT === 1 ? "System" : "Systems"} Running
+            {systemCount} {APP_COUNT === 1 ? "System" : "Systems"} Running
           </div>
           <div
             className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium md:px-4 md:text-sm"
             style={{ background: "var(--badge-bg)", color: "var(--badge-text)" }}
           >
-            <Zap size={14} />
-            Experiments Active
+            <Zap size={14} className="animate-pulse" />
+            {experimentCount} Experiments Active
           </div>
         </motion.div>
 

@@ -248,8 +248,14 @@ export default function LabActivity() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
-              {refreshing ? "Refreshing..." : "Refresh"}
+              <motion.span
+                animate={refreshing ? { rotate: 360 } : { rotate: 0 }}
+                transition={refreshing ? { duration: 0.8, repeat: Infinity, ease: "linear" } : { duration: 0.3 }}
+                className="flex items-center"
+              >
+                <RefreshCw size={12} />
+              </motion.span>
+              {refreshing ? "Updating..." : "Refresh"}
             </motion.button>
           </div>
         </motion.div>
@@ -346,9 +352,16 @@ export default function LabActivity() {
             &ldquo;This lab is active, experiments are running, and systems are alive.&rdquo;
           </p>
           {currentStatus.checkedAt && (
-            <p className="text-[10px] md:text-xs" style={{ color: "var(--muted)", opacity: 0.6 }}>
+            <motion.p
+              key={currentStatus.checkedAt}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 0.6, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-[10px] md:text-xs"
+              style={{ color: "var(--muted)" }}
+            >
               Last checked: {timeAgo(currentStatus.checkedAt)} &middot; Auto-refreshes every 30s
-            </p>
+            </motion.p>
           )}
         </motion.div>
       </div>

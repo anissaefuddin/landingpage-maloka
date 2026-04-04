@@ -29,7 +29,7 @@ export type AppStatus = "loading" | "active" | "inactive";
 
 const typeConfig: Record<AppType, { label: string; icon: typeof Globe; color: string; cta: string }> = {
   web: { label: "Web App", icon: Globe, color: "#3b82f6", cta: "Open App" },
-  mobile: { label: "Mobile App", icon: Smartphone, color: "#8b5cf6", cta: "Try via Contact" },
+  mobile: { label: "Mobile App", icon: Smartphone, color: "#8b5cf6", cta: "Contact" },
   api: { label: "API", icon: Server, color: "#06b6d4", cta: "View Docs" },
   internal: { label: "Internal", icon: Lock, color: "#6b7280", cta: "Private" },
 };
@@ -140,7 +140,7 @@ export function FeaturedCard({ app, status, responseTime, checkedAt, uptime, onM
               {responseTime != null && responseTime >= 0 && (
                 <div className="flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium text-white/80 backdrop-blur-sm">
                   <Gauge size={11} />
-                  {responseTime}ms
+                  {humanizeResponseTime(responseTime)}
                 </div>
               )}
               {uptime && (
@@ -295,10 +295,18 @@ function StatusDot({ status, small }: { status: AppStatus; small?: boolean }) {
   return (
     <span className={`relative flex ${size}`}>
       {isOnline && (
-        <span
-          className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75`}
-          style={{ background: "#34d399" }}
-        />
+        <>
+          <span
+            className="absolute inline-flex h-full w-full rounded-full opacity-75"
+            style={{ background: "#34d399", animation: "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite" }}
+          />
+          {!small && (
+            <span
+              className="absolute -inset-1 rounded-full opacity-30 blur-sm"
+              style={{ background: "#34d399" }}
+            />
+          )}
+        </>
       )}
       <span
         className={`relative inline-flex ${size} rounded-full`}
@@ -306,4 +314,11 @@ function StatusDot({ status, small }: { status: AppStatus; small?: boolean }) {
       />
     </span>
   );
+}
+
+/* ── Humanize response time ── */
+function humanizeResponseTime(ms: number): string {
+  if (ms < 500) return "⚡ Fast";
+  if (ms < 2000) return "🟡 Normal";
+  return "🔴 Slow";
 }

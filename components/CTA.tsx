@@ -65,14 +65,14 @@ export default function CTA() {
                 style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)", color: "var(--accent)" }}
               >
                 <Zap size={12} />
-                Limited project slots available
+                Only 2–3 slots available this month
               </span>
               <span
                 className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
                 style={{ background: "var(--badge-bg)", color: "var(--badge-text)" }}
               >
                 <Clock size={12} />
-                Responds within hours
+                Usually replies within minutes
               </span>
             </div>
             <p className="text-xs" style={{ color: "var(--muted)" }}>
@@ -129,7 +129,7 @@ export default function CTA() {
             <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "var(--badge-text)" }} />
           </span>
           <span className="text-sm font-medium" style={{ color: "var(--muted)" }}>
-            Response within 24 hours
+            Usually responds within minutes
           </span>
         </motion.div>
 

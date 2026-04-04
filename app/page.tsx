@@ -3,6 +3,7 @@ import LabActivity from "@/components/LabActivity";
 import SystemSummary from "@/components/SystemSummary";
 import CollaborationFlow from "@/components/CollaborationFlow";
 import CTA from "@/components/CTA";
+import FloatingStatusBar from "@/components/FloatingStatusBar";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <SystemSummary />
       <CollaborationFlow />
       <CTA />
+      <FloatingStatusBar />
     </main>
   );
 }

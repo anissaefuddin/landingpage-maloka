@@ -54,6 +54,13 @@ type Step = (typeof steps)[number];
 function MobileStepSlider({ steps, inView }: { steps: Step[]; inView: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [showHint, setShowHint] = useState(true);
+
+  // Hide swipe hint after 3s
+  useEffect(() => {
+    const t = setTimeout(() => setShowHint(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -61,7 +68,8 @@ function MobileStepSlider({ steps, inView }: { steps: Step[]; inView: boolean })
     const cardW = el.firstElementChild ? (el.firstElementChild as HTMLElement).offsetWidth + 12 : 1;
     const idx = Math.round(el.scrollLeft / cardW);
     setActiveIdx(Math.min(idx, steps.length - 1));
-  }, [steps.length]);
+    if (showHint) setShowHint(false);
+  }, [steps.length, showHint]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -70,79 +78,112 @@ function MobileStepSlider({ steps, inView }: { steps: Step[]; inView: boolean })
     return () => el.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
+  const progress = steps.length > 1 ? activeIdx / (steps.length - 1) : 0;
+
   return (
     <div className="md:hidden">
+      {/* Swipe hint */}
+      <motion.p
+        initial={{ opacity: 0.8 }}
+        animate={{ opacity: showHint ? 0.7 : 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-3 text-center text-[11px] font-medium"
+        style={{ color: "var(--muted)", pointerEvents: "none" }}
+      >
+        Swipe to explore →
+      </motion.p>
+
       <div
         ref={scrollRef}
         className="scrollbar-hide -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4"
         style={{ scrollbarWidth: "none" }}
       >
-        {steps.map((step, i) => (
-          <motion.div
-            key={step.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.1 * i + 0.3, duration: 0.4 }}
-            className="w-[75vw] min-w-[75vw] snap-center rounded-2xl border p-5"
-            style={{
-              background: "var(--card-bg)",
-              borderColor: i === activeIdx ? step.color : "var(--card-border)",
-              boxShadow: i === activeIdx ? `0 8px 24px color-mix(in srgb, ${step.color} 20%, transparent)` : "none",
-            }}
-          >
-            <div className="mb-3 flex items-center gap-3">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{
-                  background: `color-mix(in srgb, ${step.color} 15%, transparent)`,
-                  color: step.color,
-                }}
-              >
-                <step.icon size={20} />
-              </div>
-              <div>
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wider"
-                  style={{ color: step.color }}
+        {steps.map((step, i) => {
+          const isActive = i === activeIdx;
+          return (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0, scale: isActive ? 1.02 : 0.97 } : {}}
+              transition={{ delay: 0.1 * i + 0.3, duration: 0.4, scale: { type: "spring", bounce: 0.3 } }}
+              className="w-[75vw] min-w-[75vw] snap-center rounded-2xl border p-5"
+              style={{
+                background: "var(--card-bg)",
+                borderColor: isActive ? step.color : "var(--card-border)",
+                boxShadow: isActive ? `0 8px 28px color-mix(in srgb, ${step.color} 25%, transparent)` : "none",
+                opacity: isActive ? 1 : 0.65,
+              }}
+            >
+              <div className="mb-3 flex items-center gap-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl"
+                  style={{
+                    background: `color-mix(in srgb, ${step.color} 15%, transparent)`,
+                    color: step.color,
+                  }}
                 >
-                  Step {i + 1}
-                </span>
-                <h3
-                  className="text-base font-bold"
-                  style={{ fontFamily: "var(--font-space-grotesk)" }}
-                >
-                  {step.title}
-                </h3>
+                  <step.icon size={20} />
+                </div>
+                <div>
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-wider"
+                    style={{ color: step.color }}
+                  >
+                    Step {i + 1}
+                  </span>
+                  <h3
+                    className="text-base font-bold"
+                    style={{ fontFamily: "var(--font-space-grotesk)" }}
+                  >
+                    {step.title}
+                  </h3>
+                </div>
               </div>
-            </div>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
-              {step.description}
-            </p>
-          </motion.div>
-        ))}
+              <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+                {step.description}
+              </p>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Dot indicators */}
-      <div className="mt-2 flex items-center justify-center gap-2">
-        {steps.map((step, i) => (
-          <motion.button
-            key={i}
-            onClick={() => {
-              const el = scrollRef.current;
-              if (!el || !el.firstElementChild) return;
-              const cardW = (el.firstElementChild as HTMLElement).offsetWidth + 12;
-              el.scrollTo({ left: cardW * i, behavior: "smooth" });
-            }}
-            className="rounded-full transition-all duration-300"
-            style={{
-              width: i === activeIdx ? 20 : 6,
-              height: 6,
-              background: i === activeIdx ? step.color : "var(--card-border)",
-            }}
-            whileTap={{ scale: 0.9 }}
-            aria-label={`Go to step ${i + 1}`}
+      {/* Progress line + Dot indicators */}
+      <div className="mt-3 flex flex-col items-center gap-2">
+        {/* Progress bar */}
+        <div
+          className="h-0.5 w-24 overflow-hidden rounded-full"
+          style={{ background: "var(--card-border)" }}
+        >
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, var(--primary), var(--accent))" }}
+            animate={{ width: `${progress * 100}%` }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
-        ))}
+        </div>
+
+        <div className="flex items-center justify-center gap-2">
+          {steps.map((step, i) => (
+            <motion.button
+              key={i}
+              onClick={() => {
+                const el = scrollRef.current;
+                if (!el || !el.firstElementChild) return;
+                const cardW = (el.firstElementChild as HTMLElement).offsetWidth + 12;
+                el.scrollTo({ left: cardW * i, behavior: "smooth" });
+              }}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: i === activeIdx ? 20 : 6,
+                height: 6,
+                background: i === activeIdx ? step.color : "var(--card-border)",
+                opacity: i === activeIdx ? 1 : 0.4,
+              }}
+              whileTap={{ scale: 0.9 }}
+              aria-label={`Go to step ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -58,11 +58,12 @@ const stats: {
   label: string;
   color: string;
   trend?: string;
+  featured?: boolean;
 }[] = [
   { icon: Globe, end: APP_COUNT, label: "Apps Deployed", color: "var(--primary)", trend: "Live systems" },
   { icon: Database, end: 3, label: "Active Databases", color: "var(--secondary)", trend: "All healthy" },
   { icon: GitBranch, end: 100, suffix: "+", label: "Git Commits", color: "var(--accent)", trend: "+15 this week" },
-  { icon: Shield, end: 99, suffix: ".9%", label: "Uptime Target", color: "var(--accent-alt)", trend: "On track" },
+  { icon: Shield, end: 99, suffix: ".9%", label: "Uptime Target", color: "var(--accent-alt)", trend: "On track", featured: true },
 ];
 
 const capabilities = [
@@ -155,9 +156,23 @@ export default function SystemSummary() {
               transition={{ delay: 0.1 * i + 0.3, duration: 0.5 }}
               whileHover={{ scale: 1.06, y: -6, boxShadow: `0 12px 32px color-mix(in srgb, ${stat.color} 25%, transparent)` }}
               whileTap={{ scale: 0.97 }}
-              className="group rounded-2xl border p-4 text-center transition-shadow duration-300 backdrop-blur-sm md:p-5"
-              style={{ background: "color-mix(in srgb, var(--card-bg) 90%, transparent)", borderColor: "var(--card-border)" }}
+              className={`group rounded-2xl border p-4 text-center transition-shadow duration-300 backdrop-blur-sm md:p-5 ${stat.featured ? "relative ring-1 ring-[var(--accent-alt)]/30" : ""}`}
+              style={{
+                background: stat.featured
+                  ? "color-mix(in srgb, var(--card-bg) 85%, transparent)"
+                  : "color-mix(in srgb, var(--card-bg) 90%, transparent)",
+                borderColor: stat.featured ? "var(--accent-alt)" : "var(--card-border)",
+                boxShadow: stat.featured ? `0 0 20px color-mix(in srgb, var(--accent-alt) 15%, transparent)` : undefined,
+              }}
             >
+              {stat.featured && (
+                <motion.div
+                  className="absolute -inset-px rounded-2xl opacity-40"
+                  style={{ border: "1px solid var(--accent-alt)" }}
+                  animate={{ opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+              )}
               <motion.div
                 className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl"
                 style={{ background: `color-mix(in srgb, ${stat.color} 15%, transparent)`, color: stat.color }}
@@ -178,6 +193,11 @@ export default function SystemSummary() {
               {stat.trend && (
                 <p className="mt-1.5 text-[10px] font-semibold" style={{ color: stat.color, opacity: 0.7 }}>
                   {stat.trend}
+                </p>
+              )}
+              {stat.featured && (
+                <p className="mt-1 text-[9px] font-medium" style={{ color: "var(--muted)", opacity: 0.6 }}>
+                  Last incident: none
                 </p>
               )}
             </motion.div>
