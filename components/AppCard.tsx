@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Clock, Gauge, ArrowUpRight } from "lucide-react";
 
 export type AppItem = {
   name: string;
@@ -17,10 +17,17 @@ export type AppStatus = "loading" | "active" | "inactive";
 type FeaturedCardProps = {
   app: AppItem;
   status: AppStatus;
+  responseTime?: number;
+  checkedAt?: string;
+  uptime?: string;
 };
 
-export function FeaturedCard({ app, status }: FeaturedCardProps) {
+export function FeaturedCard({ app, status, responseTime, checkedAt, uptime }: FeaturedCardProps) {
   return (
+    <motion.div
+      animate={{ y: [0, -4, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+    >
     <AnimatePresence mode="wait">
       <motion.a
         key={app.url}
@@ -32,7 +39,7 @@ export function FeaturedCard({ app, status }: FeaturedCardProps) {
         exit={{ opacity: 0, y: -16, scale: 0.97 }}
         transition={{ duration: 0.35, type: "spring", bounce: 0.2 }}
         whileHover={{ scale: 1.01 }}
-        className="group relative block h-full w-full overflow-hidden rounded-3xl border shadow-lg"
+        className="group relative block h-full w-full overflow-hidden rounded-3xl border shadow-lg transition-shadow duration-300 hover:shadow-2xl"
         style={{
           background: "var(--card-bg)",
           borderColor: "var(--card-border)",
@@ -56,13 +63,34 @@ export function FeaturedCard({ app, status }: FeaturedCardProps) {
             />
           )}
 
-          {/* Gradient overlay at bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
+          {/* Light reflection gradient */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-          {/* Status badge */}
+          {/* Gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+          {/* Status badge — top right */}
           <div className="absolute top-4 right-4">
             <StatusBadge status={status} />
           </div>
+
+          {/* Micro details — top left */}
+          {status !== "loading" && (
+            <div className="absolute top-4 left-4 flex items-center gap-2">
+              {responseTime != null && responseTime >= 0 && (
+                <div className="flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium text-white/80 backdrop-blur-sm">
+                  <Gauge size={11} />
+                  {responseTime}ms
+                </div>
+              )}
+              {uptime && (
+                <div className="flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium text-white/80 backdrop-blur-sm">
+                  <Clock size={11} />
+                  {uptime} uptime
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Bottom info overlay */}
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-6">
@@ -81,12 +109,13 @@ export function FeaturedCard({ app, status }: FeaturedCardProps) {
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm"
               whileHover={{ scale: 1.15, backgroundColor: "rgba(255,255,255,0.35)" }}
             >
-              <ExternalLink size={18} className="text-white" />
+              <ArrowUpRight size={18} className="text-white" />
             </motion.div>
           </div>
         </div>
       </motion.a>
     </AnimatePresence>
+    </motion.div>
   );
 }
 

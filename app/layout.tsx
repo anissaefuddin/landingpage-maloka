@@ -3,6 +3,7 @@ import { Poppins, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
 import Cursor from "@/components/Cursor";
+import ScrollProgress from "@/components/ScrollProgress";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -62,6 +63,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <ScrollProgress />
         <Cursor />
         <ThemeToggle />
         {children}

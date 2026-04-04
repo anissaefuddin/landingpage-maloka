@@ -2,13 +2,19 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, RefreshCw } from "lucide-react";
 import { FeaturedCard, TabThumb, type AppItem } from "./AppCard";
 
 const AUTO_ADVANCE_MS = 6000;
+const REFRESH_INTERVAL_MS = 30000;
 const MAX_VISIBLE_TABS = 5;
 
 const apps: AppItem[] = [
+  {
+    name: "Knowledge Platform",
+    image: "/images/knowledge.svg",
+    url: "https://knowledge.maloka.app",
+  },
   {
     name: "Agro System",
     image: "/images/agro.svg",
@@ -20,9 +26,9 @@ const apps: AppItem[] = [
     url: "https://rims.maloka.app",
   },
   {
-    name: "Knowledge Platform",
+    name: "Knowledge Platform 2",
     image: "/images/knowledge.svg",
-    url: "https://knowledge.maloka.app",
+    url: "https://knowledge2.maloka.app",
   },
   {
     name: "API System",
@@ -41,7 +47,24 @@ const apps: AppItem[] = [
   },
 ];
 
-type StatusMap = Record<string, "loading" | "active" | "inactive">;
+type AppStatus = "loading" | "active" | "inactive";
+
+type StatusInfo = {
+  status: AppStatus;
+  responseTime: number;
+  checkedAt: string;
+  uptime: string;
+};
+
+type StatusMap = Record<string, StatusInfo>;
+
+function timeAgo(iso: string): string {
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (diff < 5) return "just now";
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  return `${Math.floor(diff / 3600)}h ago`;
+}
 
 export default function LabActivity() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -51,37 +74,68 @@ export default function LabActivity() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [cardHeight, setCardHeight] = useState<number | undefined>(undefined);
+  const [refreshing, setRefreshing] = useState(false);
   const [statuses, setStatuses] = useState<StatusMap>(() => {
     const initial: StatusMap = {};
     apps.forEach((app) => {
-      initial[app.url] = "loading";
+      initial[app.url] = {
+        status: "loading",
+        responseTime: -1,
+        checkedAt: "",
+        uptime: "99.9%",
+      };
     });
     return initial;
   });
 
-  const activeCount = Object.values(statuses).filter((s) => s === "active").length;
-  const isChecking = Object.values(statuses).some((s) => s === "loading");
+  const activeCount = Object.values(statuses).filter((s) => s.status === "active").length;
+  const isChecking = Object.values(statuses).some((s) => s.status === "loading");
   const needsScroll = apps.length > MAX_VISIBLE_TABS;
 
   // Check statuses via API route
-  useEffect(() => {
-    const checkStatus = async (app: AppItem) => {
+  const checkAllStatuses = useCallback(async (silent = false) => {
+    if (!silent) setRefreshing(true);
+    for (let i = 0; i < apps.length; i++) {
+      const app = apps[i];
       try {
         const res = await fetch(`/api/status?url=${encodeURIComponent(app.url)}`);
         const data = await res.json();
         setStatuses((prev) => ({
           ...prev,
-          [app.url]: data.status === "active" ? "active" : "inactive",
+          [app.url]: {
+            status: data.status === "active" ? "active" : "inactive",
+            responseTime: data.responseTime ?? -1,
+            checkedAt: data.checkedAt ?? new Date().toISOString(),
+            uptime: prev[app.url]?.uptime ?? "99.9%",
+          },
         }));
       } catch {
-        setStatuses((prev) => ({ ...prev, [app.url]: "inactive" }));
+        setStatuses((prev) => ({
+          ...prev,
+          [app.url]: {
+            ...prev[app.url],
+            status: "inactive",
+            responseTime: -1,
+            checkedAt: new Date().toISOString(),
+          },
+        }));
       }
-    };
-
-    apps.forEach((app, i) => {
-      setTimeout(() => checkStatus(app), i * 300);
-    });
+      // Stagger requests
+      if (i < apps.length - 1) await new Promise((r) => setTimeout(r, 200));
+    }
+    setRefreshing(false);
   }, []);
+
+  // Initial check
+  useEffect(() => {
+    checkAllStatuses();
+  }, [checkAllStatuses]);
+
+  // Auto-refresh every 30s
+  useEffect(() => {
+    const timer = setInterval(() => checkAllStatuses(true), REFRESH_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [checkAllStatuses]);
 
   // Auto-advance
   useEffect(() => {
@@ -103,7 +157,7 @@ export default function LabActivity() {
     return () => ro.disconnect();
   }, [activeIndex]);
 
-  // Scroll active tab into view (scoped to tab container only, not the page)
+  // Scroll active tab into view (scoped to tab container only)
   useEffect(() => {
     const container = tabListRef.current;
     if (!container) return;
@@ -144,15 +198,18 @@ export default function LabActivity() {
     el.scrollBy({ top: dir === "up" ? -thumbH - 12 : thumbH + 12, behavior: "smooth" });
   };
 
+  const currentApp = apps[activeIndex];
+  const currentStatus = statuses[currentApp.url];
+
   return (
-    <section id="lab-status" ref={sectionRef} className="relative overflow-hidden px-6 py-24 md:py-32">
+    <section id="lab-status" ref={sectionRef} className="noise-overlay relative overflow-hidden px-6 py-24 md:py-32">
       {/* Background decoration */}
       <div
-        className="animate-gradient absolute top-0 right-0 h-72 w-72 rounded-full opacity-10 blur-3xl"
+        className="animate-gradient absolute top-0 right-0 h-96 w-96 rounded-full opacity-10 blur-3xl"
         style={{ background: "linear-gradient(135deg, var(--secondary), var(--primary))" }}
       />
       <div
-        className="animate-gradient absolute -bottom-20 -left-20 h-64 w-64 rounded-full opacity-10 blur-3xl"
+        className="animate-gradient absolute -bottom-20 -left-20 h-80 w-80 rounded-full opacity-10 blur-3xl"
         style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-alt))" }}
       />
 
@@ -192,20 +249,39 @@ export default function LabActivity() {
           </h2>
 
           <p className="mx-auto mb-2 max-w-lg text-base" style={{ color: "var(--muted)" }}>
-            Real systems currently running in the lab
+            Live systems are actually running right now
           </p>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ delay: 0.3 }}
-            className="text-sm font-medium"
-            style={{ color: "var(--primary)" }}
-          >
-            {isChecking
-              ? "Checking systems..."
-              : `${activeCount} of ${apps.length} Projects Running`}
-          </motion.p>
+          {/* Status summary row */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : {}}
+              transition={{ delay: 0.3 }}
+              className="text-sm font-medium"
+              style={{ color: "var(--primary)" }}
+            >
+              {isChecking
+                ? "Checking systems..."
+                : `${activeCount} of ${apps.length} Systems Running`}
+            </motion.span>
+
+            <motion.button
+              onClick={() => checkAllStatuses()}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+              style={{
+                borderColor: "var(--card-border)",
+                color: "var(--muted)",
+                background: "var(--card-bg)",
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Side-by-side: Tabs (left) + Featured card (right) */}
@@ -217,12 +293,11 @@ export default function LabActivity() {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          {/* Tab list — left (height matches featured card) */}
+          {/* Tab list — left */}
           <div
             className="tab-panel-height relative flex w-full flex-col md:w-72 md:overflow-hidden"
             style={{ "--card-h": cardHeight ? `${cardHeight}px` : "auto" } as React.CSSProperties}
           >
-            {/* Scroll up */}
             {needsScroll && (
               <motion.button
                 onClick={() => scrollTabs("up")}
@@ -241,7 +316,6 @@ export default function LabActivity() {
               </motion.button>
             )}
 
-            {/* Scrollable tab container */}
             <div
               ref={tabListRef}
               className="scrollbar-hide flex flex-1 flex-row gap-3 overflow-x-auto md:flex-col md:overflow-x-hidden md:overflow-y-auto"
@@ -251,7 +325,7 @@ export default function LabActivity() {
                 <div key={app.url} className="shrink-0 md:shrink">
                   <TabThumb
                     app={app}
-                    status={statuses[app.url]}
+                    status={statuses[app.url].status}
                     isActive={i === activeIndex}
                     onClick={() => setActiveIndex(i)}
                   />
@@ -259,7 +333,6 @@ export default function LabActivity() {
               ))}
             </div>
 
-            {/* Scroll down */}
             {needsScroll && (
               <motion.button
                 onClick={() => scrollTabs("down")}
@@ -282,22 +355,31 @@ export default function LabActivity() {
           {/* Featured card — right */}
           <div ref={cardRef} className="min-w-0 flex-[2]">
             <FeaturedCard
-              app={apps[activeIndex]}
-              status={statuses[apps[activeIndex].url]}
+              app={currentApp}
+              status={currentStatus.status}
+              responseTime={currentStatus.responseTime}
+              checkedAt={currentStatus.checkedAt}
+              uptime={currentStatus.uptime}
             />
           </div>
         </motion.div>
 
-        {/* Narrative message */}
-        <motion.p
+        {/* Last checked footer */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ delay: 0.8 }}
-          className="mt-10 text-center text-sm italic"
-          style={{ color: "var(--muted)" }}
+          className="mt-8 flex flex-col items-center gap-2"
         >
-          &ldquo;This lab is active, experiments are running, and systems are alive.&rdquo;
-        </motion.p>
+          <p className="text-center text-sm italic" style={{ color: "var(--muted)" }}>
+            &ldquo;This lab is active, experiments are running, and systems are alive.&rdquo;
+          </p>
+          {currentStatus.checkedAt && (
+            <p className="text-xs" style={{ color: "var(--muted)", opacity: 0.6 }}>
+              Last checked: {timeAgo(currentStatus.checkedAt)} &middot; Auto-refreshes every 30s
+            </p>
+          )}
+        </motion.div>
       </div>
     </section>
   );

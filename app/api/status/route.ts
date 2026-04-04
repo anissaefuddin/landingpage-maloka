@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
+    const start = Date.now();
 
     const res = await fetch(url, {
       method: "HEAD",
@@ -20,12 +21,15 @@ export async function GET(request: NextRequest) {
     });
 
     clearTimeout(timeout);
+    const responseTime = Date.now() - start;
 
     return Response.json({
       status: res.ok ? "active" : "inactive",
       code: res.status,
+      responseTime,
+      checkedAt: new Date().toISOString(),
     });
   } catch {
-    return Response.json({ status: "inactive", code: 0 });
+    return Response.json({ status: "inactive", code: 0, responseTime: -1, checkedAt: new Date().toISOString() });
   }
 }

@@ -2,30 +2,33 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Server, FlaskConical, Blocks } from "lucide-react";
+import { Server, FlaskConical, Blocks, Rocket } from "lucide-react";
 
 const items = [
   {
     icon: Server,
-    title: "Real Systems Built",
+    title: "Systems Running in Production",
     description:
-      "Production-grade applications powering real businesses — from agriculture to research management.",
+      "6+ applications deployed and actively used — from agro-tech to internal systems.",
+    proof: "6+ apps deployed",
     color: "#7c3aed",
     accent: "var(--primary)",
   },
   {
     icon: FlaskConical,
-    title: "Live Experiments",
+    title: "Experiments Running in the Lab",
     description:
-      "Constantly prototyping, testing, and iterating on new ideas. The lab never sleeps.",
+      "Continuous prototyping and testing of new ideas — the lab is always active.",
+    proof: "Active environments",
     color: "#06b6d4",
     accent: "var(--secondary)",
   },
   {
     icon: Blocks,
-    title: "Scalable Architecture",
+    title: "Built on Modular Architecture",
     description:
-      "Built on modern, modular foundations designed to grow with your ambitions.",
+      "Designed with scalable, reusable components for long-term growth.",
+    proof: "Microservice-ready",
     color: "#f472b6",
     accent: "var(--accent)",
   },
@@ -36,11 +39,15 @@ export default function SocialProof() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="relative overflow-hidden px-6 py-24 md:py-32">
+    <section ref={ref} className="noise-overlay relative overflow-hidden px-6 py-24 md:py-32">
       {/* Background decoration */}
       <div
-        className="animate-gradient absolute bottom-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full opacity-10 blur-3xl"
+        className="animate-gradient absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full opacity-10 blur-3xl"
         style={{ background: "linear-gradient(135deg, var(--accent), var(--primary))" }}
+      />
+      <div
+        className="animate-gradient absolute -top-20 -right-20 h-64 w-64 rounded-full opacity-10 blur-3xl"
+        style={{ background: "linear-gradient(135deg, var(--secondary), var(--accent-alt))" }}
       />
 
       <div className="mx-auto max-w-6xl">
@@ -50,6 +57,16 @@ export default function SocialProof() {
           transition={{ duration: 0.6 }}
           className="mb-16 text-center"
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={inView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.5 }}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-2 text-sm shadow-sm"
+          >
+            <Rocket size={16} style={{ color: "var(--accent)" }} />
+            <span style={{ color: "var(--muted)" }}>Proof of Work</span>
+          </motion.div>
+
           <h2
             className="mb-4 text-3xl font-bold md:text-5xl"
             style={{ fontFamily: "var(--font-space-grotesk)" }}
@@ -74,10 +91,9 @@ export default function SocialProof() {
                 bounce: 0.35,
               }}
               whileHover={{
-                scale: 1.02,
-                rotateY: 3,
-                rotateX: -2,
-                transition: { duration: 0.2 },
+                scale: 1.03,
+                y: -6,
+                transition: { duration: 0.25 },
               }}
               className="card-hover group rounded-2xl border p-8"
               style={{
@@ -88,7 +104,7 @@ export default function SocialProof() {
               <motion.div
                 className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
                 style={{ background: `${item.color}15`, color: item.accent }}
-                whileHover={{ rotate: 10, scale: 1.1 }}
+                whileHover={{ rotate: 12, scale: 1.15 }}
                 transition={{ type: "spring", bounce: 0.5 }}
               >
                 <item.icon size={28} />
@@ -101,9 +117,21 @@ export default function SocialProof() {
                 {item.title}
               </h3>
 
-              <p className="leading-relaxed" style={{ color: "var(--muted)" }}>
+              <p className="mb-4 leading-relaxed" style={{ color: "var(--muted)" }}>
                 {item.description}
               </p>
+
+              {/* Proof indicator */}
+              <div
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                style={{ background: `${item.color}12`, color: item.accent }}
+              >
+                <span
+                  className="inline-block h-1.5 w-1.5 rounded-full"
+                  style={{ background: item.color }}
+                />
+                {item.proof}
+              </div>
 
               <div
                 className="mt-5 h-1 w-12 rounded-full transition-all duration-300 group-hover:w-full"

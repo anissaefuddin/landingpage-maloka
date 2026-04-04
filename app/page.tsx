@@ -1,6 +1,7 @@
 import HeroPlayground from "@/components/HeroPlayground";
 import LabActivity from "@/components/LabActivity";
-import SocialProof from "@/components/SocialProof";
+import SystemSummary from "@/components/SystemSummary";
+import CollaborationFlow from "@/components/CollaborationFlow";
 import CTA from "@/components/CTA";
 
 export default function Home() {
@@ -8,7 +9,8 @@ export default function Home() {
     <main>
       <HeroPlayground />
       <LabActivity />
-      <SocialProof />
+      <SystemSummary />
+      <CollaborationFlow />
       <CTA />
     </main>
   );
