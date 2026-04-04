@@ -172,7 +172,7 @@ export default function LabActivity() {
   const currentStatus = statuses[currentApp.url] ?? defaultStatus;
 
   return (
-    <section id="lab-status" ref={sectionRef} className="noise-overlay relative overflow-hidden px-6 py-24 md:py-32">
+    <section id="lab-status" ref={sectionRef} className="noise-overlay relative overflow-hidden px-5 py-16 md:px-6 md:py-32">
       {/* Background decoration */}
       <div
         className="animate-gradient absolute top-0 right-0 h-96 w-96 rounded-full opacity-10 blur-3xl"
@@ -189,7 +189,7 @@ export default function LabActivity() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-12 text-center"
+          className="mb-8 text-center md:mb-12"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -212,23 +212,23 @@ export default function LabActivity() {
           </motion.div>
 
           <h2
-            className="mb-4 text-3xl font-bold md:text-5xl"
+            className="mb-3 text-2xl font-bold md:mb-4 md:text-5xl"
             style={{ fontFamily: "var(--font-space-grotesk)" }}
           >
             Lab Activity
           </h2>
 
-          <p className="mx-auto mb-2 max-w-lg text-base" style={{ color: "var(--muted)" }}>
+          <p className="mx-auto mb-2 max-w-lg text-sm md:text-base" style={{ color: "var(--muted)" }}>
             Live systems are actually running right now
           </p>
 
           {/* Status summary row */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3 md:mt-4 md:gap-4">
             <motion.span
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.3 }}
-              className="text-sm font-medium"
+              className="text-xs font-medium md:text-sm"
               style={{ color: "var(--primary)" }}
             >
               {isChecking
@@ -239,7 +239,7 @@ export default function LabActivity() {
             <motion.button
               onClick={() => checkAllStatuses()}
               disabled={refreshing}
-              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors md:py-1"
               style={{
                 borderColor: "var(--card-border)",
                 color: "var(--muted)",
@@ -259,7 +259,7 @@ export default function LabActivity() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="flex flex-col-reverse gap-5 md:flex-row md:items-start"
+          className="flex flex-col-reverse gap-4 md:flex-row md:items-start md:gap-5"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
@@ -288,11 +288,11 @@ export default function LabActivity() {
 
             <div
               ref={tabListRef}
-              className="scrollbar-hide flex flex-1 flex-row gap-3 overflow-x-auto md:flex-col md:overflow-x-hidden md:overflow-y-auto"
+              className="scrollbar-hide flex flex-1 snap-x snap-mandatory flex-row gap-3 overflow-x-auto pb-1 md:snap-none md:flex-col md:overflow-x-hidden md:overflow-y-auto md:pb-0"
               style={{ scrollbarWidth: "none" }}
             >
               {apps.map((app, i) => (
-                <div key={app.url} className="shrink-0 md:shrink">
+                <div key={app.url} className="min-w-[200px] shrink-0 snap-start md:min-w-0 md:shrink">
                   <TabThumb
                     app={app}
                     status={(statuses[app.url] ?? defaultStatus).status}
@@ -340,13 +340,13 @@ export default function LabActivity() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ delay: 0.8 }}
-          className="mt-8 flex flex-col items-center gap-2"
+          className="mt-6 flex flex-col items-center gap-2 md:mt-8"
         >
-          <p className="text-center text-sm italic" style={{ color: "var(--muted)" }}>
+          <p className="text-center text-xs italic md:text-sm" style={{ color: "var(--muted)" }}>
             &ldquo;This lab is active, experiments are running, and systems are alive.&rdquo;
           </p>
           {currentStatus.checkedAt && (
-            <p className="text-xs" style={{ color: "var(--muted)", opacity: 0.6 }}>
+            <p className="text-[10px] md:text-xs" style={{ color: "var(--muted)", opacity: 0.6 }}>
               Last checked: {timeAgo(currentStatus.checkedAt)} &middot; Auto-refreshes every 30s
             </p>
           )}

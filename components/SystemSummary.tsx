@@ -91,7 +91,7 @@ export default function SystemSummary() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="relative overflow-hidden px-6 py-24 md:py-32">
+    <section ref={ref} className="relative overflow-hidden px-5 py-16 md:px-6 md:py-32">
       {/* Background */}
       <div
         className="animate-gradient absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-3xl"
@@ -104,7 +104,7 @@ export default function SystemSummary() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-16 text-center"
+          className="mb-10 text-center md:mb-16"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -117,12 +117,12 @@ export default function SystemSummary() {
           </motion.div>
 
           <h2
-            className="mb-4 text-3xl font-bold md:text-5xl"
+            className="mb-3 text-2xl font-bold md:mb-4 md:text-5xl"
             style={{ fontFamily: "var(--font-space-grotesk)" }}
           >
             Lab Infrastructure
           </h2>
-          <p className="mx-auto max-w-lg text-base" style={{ color: "var(--muted)" }}>
+          <p className="mx-auto max-w-lg text-sm md:text-base" style={{ color: "var(--muted)" }}>
             A snapshot of the systems powering the maloka lab — always running, always evolving.
           </p>
         </motion.div>
@@ -145,7 +145,7 @@ export default function SystemSummary() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="mb-16 grid grid-cols-2 gap-4 md:grid-cols-4"
+          className="mb-10 grid grid-cols-2 gap-3 md:mb-16 md:grid-cols-4 md:gap-4"
         >
           {stats.map((stat, i) => (
             <motion.div
@@ -154,8 +154,9 @@ export default function SystemSummary() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.1 * i + 0.3, duration: 0.5 }}
               whileHover={{ scale: 1.06, y: -6, boxShadow: `0 12px 32px color-mix(in srgb, ${stat.color} 25%, transparent)` }}
-              className="group rounded-2xl border p-5 text-center transition-shadow duration-300"
-              style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
+              whileTap={{ scale: 0.97 }}
+              className="group rounded-2xl border p-4 text-center transition-shadow duration-300 backdrop-blur-sm md:p-5"
+              style={{ background: "color-mix(in srgb, var(--card-bg) 90%, transparent)", borderColor: "var(--card-border)" }}
             >
               <motion.div
                 className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl"
@@ -184,7 +185,7 @@ export default function SystemSummary() {
         </motion.div>
 
         {/* Capabilities grid */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3 md:gap-6">
           {capabilities.map((cap, i) => (
             <motion.div
               key={cap.title}
@@ -192,8 +193,9 @@ export default function SystemSummary() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.15 * i + 0.5, duration: 0.6, type: "spring", bounce: 0.3 }}
               whileHover={{ scale: 1.03, y: -4 }}
-              className="card-hover group rounded-2xl border p-7"
-              style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}
+              whileTap={{ scale: 0.98 }}
+              className="card-hover group rounded-2xl border p-5 backdrop-blur-sm md:p-7"
+              style={{ background: "color-mix(in srgb, var(--card-bg) 90%, transparent)", borderColor: "var(--card-border)" }}
             >
               <motion.div
                 className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl"

@@ -95,12 +95,12 @@ export default function HeroPlayground() {
     <section
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="noise-overlay relative flex min-h-screen items-center justify-center overflow-hidden px-6"
+      className="noise-overlay relative flex min-h-screen items-center justify-center overflow-hidden px-5 md:px-6"
       style={{ background: "var(--background)" }}
     >
-      {/* Cursor-reactive glow */}
+      {/* Cursor-reactive glow — hidden on mobile for performance */}
       <motion.div
-        className="pointer-events-none absolute h-[600px] w-[600px] rounded-full opacity-15 blur-[100px]"
+        className="pointer-events-none absolute hidden h-[600px] w-[600px] rounded-full opacity-15 blur-[100px] md:block"
         style={{
           background: "radial-gradient(circle, var(--primary), transparent 70%)",
           left: glowX,
@@ -110,11 +110,11 @@ export default function HeroPlayground() {
         }}
       />
 
-      {/* Floating shapes with parallax */}
+      {/* Floating shapes with parallax — show fewer on mobile for perf */}
       {floatingShapes.map((shape, i) => (
         <motion.div
           key={i}
-          className={`absolute rounded-full opacity-20 blur-sm ${shape.anim}`}
+          className={`absolute rounded-full opacity-20 blur-sm ${shape.anim} ${i >= 5 ? "hidden md:block" : ""}`}
           style={{
             width: shape.size,
             height: shape.size,
@@ -131,23 +131,23 @@ export default function HeroPlayground() {
         />
       ))}
 
-      {/* Decorative blobs */}
+      {/* Decorative blobs — smaller on mobile */}
       <div
-        className="animate-gradient absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full opacity-20 blur-3xl"
+        className="animate-gradient absolute -top-40 -right-40 h-[300px] w-[300px] rounded-full opacity-20 blur-3xl md:h-[500px] md:w-[500px]"
         style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary))" }}
       />
       <div
-        className="animate-gradient absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full opacity-15 blur-3xl"
+        className="animate-gradient absolute -bottom-40 -left-40 h-[300px] w-[300px] rounded-full opacity-15 blur-3xl md:h-[500px] md:w-[500px]"
         style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-alt))" }}
       />
       <div
-        className="animate-gradient absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-3xl"
+        className="animate-gradient absolute top-1/2 left-1/2 hidden h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-3xl md:block"
         style={{ background: "linear-gradient(135deg, var(--secondary), var(--accent))" }}
       />
 
       {/* Content */}
       <motion.div
-        className="relative z-10 max-w-3xl text-center"
+        className="relative z-10 w-full max-w-3xl text-center"
         style={{ x: parallaxXSlow, y: parallaxYSlow }}
       >
         <motion.div
@@ -164,7 +164,7 @@ export default function HeroPlayground() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="mb-4 text-5xl font-bold leading-tight tracking-tight md:text-7xl"
+          className="mb-3 text-4xl font-bold leading-tight tracking-tight md:mb-4 md:text-7xl"
           style={{ fontFamily: "var(--font-space-grotesk)" }}
         >
           <span className="gradient-text">maloka.app</span>
@@ -174,7 +174,7 @@ export default function HeroPlayground() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="mb-2 text-sm font-medium uppercase tracking-widest"
+          className="mb-2 text-xs font-medium uppercase tracking-widest md:text-sm"
           style={{ color: "var(--primary)" }}
         >
           Multi Application Lab of Knowledge
@@ -184,7 +184,7 @@ export default function HeroPlayground() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mx-auto mb-8 max-w-xl text-lg leading-relaxed md:text-xl"
+          className="mx-auto mb-8 max-w-xl text-base leading-relaxed md:text-xl"
           style={{ color: "var(--muted)" }}
         >
           A living lab where real systems are built, deployed, and continuously evolving.
@@ -195,10 +195,10 @@ export default function HeroPlayground() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
-          className="mb-10 flex items-center justify-center gap-6"
+          className="mb-8 flex flex-wrap items-center justify-center gap-3 md:mb-10 md:gap-6"
         >
           <div
-            className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
+            className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium md:px-4 md:text-sm"
             style={{ background: "var(--badge-bg)", color: "var(--badge-text)" }}
           >
             <span className="relative flex h-2 w-2">
@@ -211,7 +211,7 @@ export default function HeroPlayground() {
             {APP_COUNT} {APP_COUNT === 1 ? "System" : "Systems"} Running
           </div>
           <div
-            className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
+            className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium md:px-4 md:text-sm"
             style={{ background: "var(--badge-bg)", color: "var(--badge-text)" }}
           >
             <Zap size={14} />
@@ -223,11 +223,11 @@ export default function HeroPlayground() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
-          className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+          className="flex w-full flex-col items-center justify-center gap-3 px-2 sm:flex-row sm:gap-4 sm:px-0"
         >
           <MagneticButton
             href="#lab-status"
-            className="ripple inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-shadow duration-300 hover:shadow-[0_10px_40px_rgba(124,58,237,0.4)]"
+            className="ripple inline-flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-semibold text-white shadow-lg transition-shadow duration-300 hover:shadow-[0_10px_40px_rgba(124,58,237,0.4)] sm:w-auto sm:rounded-full sm:px-8 sm:py-3.5"
             style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary))" }}
           >
             <Activity size={18} />
@@ -235,7 +235,7 @@ export default function HeroPlayground() {
           </MagneticButton>
           <MagneticButton
             href="#cta"
-            className="ripple inline-flex items-center gap-2 rounded-full border-2 px-8 py-3.5 text-base font-semibold transition-colors duration-300 hover:bg-[var(--primary)] hover:text-white"
+            className="ripple inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 py-4 text-base font-semibold transition-colors duration-300 hover:bg-[var(--primary)] hover:text-white sm:w-auto sm:rounded-full sm:px-8 sm:py-3.5"
             style={{
               borderColor: "var(--primary)",
               color: "var(--primary)",
@@ -248,19 +248,26 @@ export default function HeroPlayground() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="flex flex-col items-center gap-2"
+        <motion.a
+          href="#lab-status"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          className="flex flex-col items-center gap-1.5 md:gap-2"
+          data-clickable
         >
-          <span className="text-xs" style={{ color: "var(--muted)" }}>Scroll to explore</span>
-          <ArrowDown size={16} style={{ color: "var(--muted)" }} />
-        </motion.div>
+          <span className="text-xs font-medium" style={{ color: "var(--foreground)", opacity: 0.6 }}>Scroll to explore</span>
+          <div
+            className="flex h-8 w-8 items-center justify-center rounded-full border md:h-auto md:w-auto md:border-0 md:bg-transparent"
+            style={{ borderColor: "var(--card-border)", background: "var(--card-bg)" }}
+          >
+            <ArrowDown size={16} style={{ color: "var(--foreground)", opacity: 0.6 }} />
+          </div>
+        </motion.a>
       </motion.div>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import {
   MessageSquare,
@@ -49,12 +49,111 @@ const steps = [
   },
 ];
 
+type Step = (typeof steps)[number];
+
+function MobileStepSlider({ steps, inView }: { steps: Step[]; inView: boolean }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardW = el.firstElementChild ? (el.firstElementChild as HTMLElement).offsetWidth + 12 : 1;
+    const idx = Math.round(el.scrollLeft / cardW);
+    setActiveIdx(Math.min(idx, steps.length - 1));
+  }, [steps.length]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  return (
+    <div className="md:hidden">
+      <div
+        ref={scrollRef}
+        className="scrollbar-hide -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {steps.map((step, i) => (
+          <motion.div
+            key={step.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1 * i + 0.3, duration: 0.4 }}
+            className="w-[75vw] min-w-[75vw] snap-center rounded-2xl border p-5"
+            style={{
+              background: "var(--card-bg)",
+              borderColor: i === activeIdx ? step.color : "var(--card-border)",
+              boxShadow: i === activeIdx ? `0 8px 24px color-mix(in srgb, ${step.color} 20%, transparent)` : "none",
+            }}
+          >
+            <div className="mb-3 flex items-center gap-3">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-xl"
+                style={{
+                  background: `color-mix(in srgb, ${step.color} 15%, transparent)`,
+                  color: step.color,
+                }}
+              >
+                <step.icon size={20} />
+              </div>
+              <div>
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: step.color }}
+                >
+                  Step {i + 1}
+                </span>
+                <h3
+                  className="text-base font-bold"
+                  style={{ fontFamily: "var(--font-space-grotesk)" }}
+                >
+                  {step.title}
+                </h3>
+              </div>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+              {step.description}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Dot indicators */}
+      <div className="mt-2 flex items-center justify-center gap-2">
+        {steps.map((step, i) => (
+          <motion.button
+            key={i}
+            onClick={() => {
+              const el = scrollRef.current;
+              if (!el || !el.firstElementChild) return;
+              const cardW = (el.firstElementChild as HTMLElement).offsetWidth + 12;
+              el.scrollTo({ left: cardW * i, behavior: "smooth" });
+            }}
+            className="rounded-full transition-all duration-300"
+            style={{
+              width: i === activeIdx ? 20 : 6,
+              height: 6,
+              background: i === activeIdx ? step.color : "var(--card-border)",
+            }}
+            whileTap={{ scale: 0.9 }}
+            aria-label={`Go to step ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function CollaborationFlow() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
-    <section ref={ref} className="relative overflow-hidden px-6 py-24 md:py-32">
+    <section ref={ref} className="relative overflow-hidden px-5 py-16 md:px-6 md:py-32">
       {/* Background */}
       <div
         className="animate-gradient absolute -bottom-32 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full opacity-10 blur-3xl"
@@ -67,7 +166,7 @@ export default function CollaborationFlow() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-16 text-center"
+          className="mb-10 text-center md:mb-16"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -80,12 +179,12 @@ export default function CollaborationFlow() {
           </motion.div>
 
           <h2
-            className="mb-4 text-3xl font-bold md:text-5xl"
+            className="mb-3 text-2xl font-bold md:mb-4 md:text-5xl"
             style={{ fontFamily: "var(--font-space-grotesk)" }}
           >
             How We Build Together
           </h2>
-          <p className="mx-auto max-w-lg text-base" style={{ color: "var(--muted)" }}>
+          <p className="mx-auto max-w-lg text-sm md:text-base" style={{ color: "var(--muted)" }}>
             From first conversation to real impact — a clear path to collaboration.
           </p>
         </motion.div>
@@ -153,77 +252,15 @@ export default function CollaborationFlow() {
           </div>
         </div>
 
-        {/* ─── Mobile: vertical flow ─── */}
-        <div className="md:hidden">
-          <div className="relative pl-8">
-            {/* Vertical connecting line */}
-            <motion.div
-              className="absolute top-0 bottom-0 left-[15px] w-0.5"
-              style={{ background: "var(--card-border)" }}
-              initial={{ scaleY: 0, originY: 0 }}
-              animate={inView ? { scaleY: 1 } : {}}
-              transition={{ delay: 0.3, duration: 1, ease: "easeInOut" }}
-            />
-            {/* Progress line overlay */}
-            <motion.div
-              className="absolute top-0 bottom-0 left-[15px] w-0.5 origin-top"
-              style={{ background: "linear-gradient(180deg, var(--primary), var(--accent))" }}
-              initial={{ scaleY: 0 }}
-              animate={inView ? { scaleY: 1 } : {}}
-              transition={{ delay: 0.6, duration: 1.5, ease: "easeInOut" }}
-            />
-
-            {steps.map((step, i) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, x: -20 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.15 * i + 0.4, duration: 0.5 }}
-                className="group relative mb-8 flex items-start gap-5 last:mb-0"
-              >
-                {/* Circle on the line */}
-                <motion.div
-                  whileHover={{ scale: 1.15 }}
-                  className="absolute -left-8 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2"
-                  style={{
-                    background: "var(--card-bg)",
-                    borderColor: step.color,
-                    color: step.color,
-                  }}
-                >
-                  <step.icon size={14} />
-                </motion.div>
-
-                <div className="pt-0.5">
-                  <div className="mb-1 flex items-center gap-2">
-                    <span
-                      className="rounded-full px-2 py-0.5 text-[10px] font-bold"
-                      style={{ background: `color-mix(in srgb, ${step.color} 12%, transparent)`, color: step.color }}
-                    >
-                      {i + 1}
-                    </span>
-                    <h3
-                      className="text-base font-bold"
-                      style={{ fontFamily: "var(--font-space-grotesk)" }}
-                    >
-                      {step.title}
-                    </h3>
-                  </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
-                    {step.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        {/* ─── Mobile: horizontal snap scroll cards ─── */}
+        <MobileStepSlider steps={steps} inView={inView} />
 
         {/* Bottom statement */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ delay: 1.2 }}
-          className="mt-14 text-center text-sm italic"
+          className="mt-8 text-center text-xs italic md:mt-14 md:text-sm"
           style={{ color: "var(--muted)" }}
         >
           &ldquo;Built using real systems, not prototypes.&rdquo;
@@ -238,7 +275,7 @@ export default function CollaborationFlow() {
         >
           <motion.a
             href="#cta"
-            className="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors md:px-0 md:py-0"
             style={{ color: "var(--primary)" }}
             whileHover={{ x: 4 }}
             data-clickable

@@ -100,7 +100,7 @@ export function FeaturedCard({ app, status, responseTime, checkedAt, uptime, onM
         data-clickable={!isInternal ? true : undefined}
       >
         {/* Image area */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden">
+        <div className="relative aspect-[4/3] w-full overflow-hidden md:aspect-[16/9]">
           {status === "loading" ? (
             <div className="absolute inset-0">
               <div className="h-full w-full animate-pulse bg-gradient-to-r from-[var(--card-bg)] via-[var(--card-border)] to-[var(--card-bg)] bg-[length:200%_100%] animate-[shimmer_1.5s_infinite]" />
@@ -153,15 +153,15 @@ export function FeaturedCard({ app, status, responseTime, checkedAt, uptime, onM
           )}
 
           {/* Bottom info overlay */}
-          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-6">
-            <div>
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 md:gap-4 md:p-6">
+            <div className="min-w-0 flex-1">
               <h3
-                className="text-xl font-bold text-white md:text-2xl"
+                className="text-lg font-bold text-white md:text-2xl"
                 style={{ fontFamily: "var(--font-space-grotesk)" }}
               >
                 {app.name}
               </h3>
-              <p className="mt-1 truncate max-w-[260px] text-sm text-white/70">
+              <p className="mt-0.5 truncate max-w-[200px] text-xs text-white/70 md:mt-1 md:max-w-[260px] md:text-sm">
                 {app.type === "internal"
                   ? "Private Access"
                   : app.type === "mobile"
@@ -170,11 +170,12 @@ export function FeaturedCard({ app, status, responseTime, checkedAt, uptime, onM
               </p>
             </div>
             <motion.div
-              className="flex shrink-0 items-center gap-2 rounded-full bg-white/20 px-4 py-2.5 backdrop-blur-sm"
+              className="flex shrink-0 items-center gap-1.5 rounded-2xl bg-white/20 px-3 py-2 backdrop-blur-sm md:gap-2 md:rounded-full md:px-4 md:py-2.5"
               whileHover={isInternal ? {} : { scale: 1.05, backgroundColor: "rgba(255,255,255,0.35)" }}
+              whileTap={isInternal ? {} : { scale: 0.97 }}
             >
               {ctaIcon}
-              <span className={`text-sm font-semibold ${isInternal ? "text-white/50" : "text-white"}`}>
+              <span className={`text-xs font-semibold md:text-sm ${isInternal ? "text-white/50" : "text-white"}`}>
                 {cfg.cta}
               </span>
             </motion.div>
@@ -202,9 +203,9 @@ export function TabThumb({ app, status, isActive, onClick }: TabThumbProps) {
   return (
     <motion.button
       onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="relative flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all duration-200 md:px-4 md:py-3"
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      className="relative flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200 md:rounded-xl md:px-4 md:py-3"
       style={{
         background: isActive ? "var(--primary)" : "var(--card-bg)",
         borderColor: isActive ? "var(--primary)" : "var(--card-border)",

@@ -53,6 +53,18 @@ body {
 @media (max-width: 768px) {
   body {
     cursor: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Reduce heavy blur on mobile for perf */
+  .animate-gradient {
+    animation: none;
+  }
+
+  /* Smoother scroll snapping */
+  .snap-x {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -120,6 +132,9 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
 }
+.card-hover:active {
+  transform: translateY(-1px) scale(0.98);
+}
 
 [data-theme="dark"] .card-hover:hover {
   box-shadow: 0 20px 40px rgba(167, 139, 250, 0.2);
@@ -154,4 +169,12 @@ body {
 /* Global smooth transitions */
 *, *::before, *::after {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glass card utility */
+.glass-card {
+  background: color-mix(in srgb, var(--card-bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--card-border);
 }

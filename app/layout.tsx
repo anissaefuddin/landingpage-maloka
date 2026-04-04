@@ -63,6 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="dark"
       className={`${poppins.variable} ${spaceGrotesk.variable} h-full antialiased`}
       suppressHydrationWarning
     >
