@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# maloka.app
+
+A playful, interactive landing page for **maloka.app** — a digital playground showcasing live lab experiments and systems.
+
+## Tech Stack
+
+- **Framework** — [Next.js 16](https://nextjs.org) (App Router, Turbopack)
+- **Language** — TypeScript
+- **Styling** — [Tailwind CSS v4](https://tailwindcss.com)
+- **Animations** — [Framer Motion](https://www.framer.com/motion/)
+- **Icons** — [Lucide React](https://lucide.dev)
+- **Fonts** — Poppins, Space Grotesk (via `next/font`)
+
+## Project Structure
+
+```
+app/
+├── api/status/route.ts   # Server-side URL health checker
+├── globals.css            # Theme variables, animations, utilities
+├── layout.tsx             # Root layout with fonts & metadata
+└── page.tsx               # Landing page (assembles sections)
+
+components/
+├── AppCard.tsx            # FeaturedCard & TabThumb components
+├── CTA.tsx                # Call-to-action section
+├── Cursor.tsx             # Custom cursor effect
+├── HeroPlayground.tsx     # Hero section with animated playground
+├── LabActivity.tsx        # Live lab status with tabbed cards
+├── SocialProof.tsx        # Social proof section
+└── ThemeToggle.tsx        # Dark/light theme switcher
+
+public/images/             # Placeholder SVG app icons
+```
+
+## Features
+
+- **Lab Activity** — Tabbed cards layout with auto-advancing featured card, vertical scrollable tab list, and live status badges fetched via server-side API route
+- **Theme Toggle** — Light/dark mode with smooth transitions
+- **Custom Cursor** — Playful cursor effect that responds to interactive elements
+- **Responsive** — Adaptive layouts for desktop, tablet, and mobile
+- **Animations** — Spring physics, staggered reveals, hover effects via Framer Motion
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## API Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/api/status?url=<url>` | GET | Checks if a URL is reachable via HEAD request. Returns `{ status: "active" }` or `{ status: "inactive" }`. |
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private project.
