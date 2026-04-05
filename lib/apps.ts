@@ -8,6 +8,13 @@ export const apps: AppItem[] = [
     type: "mobile",
     description: "A mobile application for tracking and managing transactions home stays.",
   },
+  {
+    name: "Fuelshift Apps",
+    image: "/images/fuelshift-apps.png",
+    url: "https://script.google.com/macros/s/AKfycbxDwByHkyBB2Cw5H686T1Bmrcj3_Jj5jCRAAwSg8r0DQS568tys88wt3fPRfeQAoTlt/exec",
+    type: "mobile",
+    description: "A mobile application for tracking and managing shift POM.",
+  },
 ];
 
 export const APP_COUNT = apps.length;
