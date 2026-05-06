@@ -4,6 +4,9 @@ import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
 import Cursor from "@/components/Cursor";
 import ScrollProgress from "@/components/ScrollProgress";
+import Script from "next/script";
+
+const GA_ID = "G-QZRK9PX4GG";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -38,20 +41,18 @@ export const metadata: Metadata = {
     siteName: "maloka.app",
     type: "website",
     locale: "en_US",
+    images: [{ url: "/iconSvg-avatar.png", width: 512, height: 512, alt: "maloka.app" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "maloka.app — Multi Application Lab of Knowledge",
     description:
       "A playful digital lab to build, experiment, and scale real systems.",
+    images: ["/iconSvg-avatar.png"],
   },
   robots: {
     index: true,
     follow: true,
-  },
-  icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
   },
 };
 
@@ -68,6 +69,21 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {/* Google Analytics */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
         <ScrollProgress />
         <Cursor />
         <ThemeToggle />

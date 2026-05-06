@@ -298,7 +298,7 @@ export default function LabActivity() {
               style={{ scrollbarWidth: "none" }}
             >
               {apps.map((app, i) => (
-                <div key={app.url} className="min-w-[200px] shrink-0 snap-start md:min-w-0 md:shrink">
+                <div key={`${app.name}-${app.url}`} className="min-w-[200px] shrink-0 snap-start md:min-w-0 md:shrink">
                   <TabThumb
                     app={app}
                     status={(statuses[app.url] ?? defaultStatus).status}

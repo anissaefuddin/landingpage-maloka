@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Mail, MessageCircle, Rocket, Handshake, Zap, Clock } from "lucide-react";
 import { CONTACT_EMAIL, EMAIL_URL, WA_URL, WA_DISPLAY } from "@/lib/contact";
+import BrandMark from "./BrandMark";
 
 export default function CTA() {
   const ref = useRef<HTMLElement>(null);
@@ -172,9 +173,12 @@ export default function CTA() {
           className="mt-12 border-t pt-6 md:mt-20 md:pt-8"
           style={{ borderColor: "var(--card-border)" }}
         >
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            © {new Date().getFullYear()} maloka.app — Multi Application Lab of Knowledge
-          </p>
+          <div className="flex items-center justify-center gap-2.5">
+            <BrandMark className="h-7 w-7" sizes="28px" />
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              © {new Date().getFullYear()} maloka.app — Multi Application Lab of Knowledge
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>

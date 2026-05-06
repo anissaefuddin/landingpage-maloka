@@ -4,6 +4,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Sparkles, ArrowDown, Activity, Zap } from "lucide-react";
 import { APP_COUNT } from "@/lib/apps";
+import BrandMark from "./BrandMark";
 
 /* ── Animated counter for hero badges ── */
 function useHeroCountUp(end: number, duration = 1200) {
@@ -176,9 +177,18 @@ export default function HeroPlayground() {
         style={{ x: parallaxXSlow, y: parallaxYSlow }}
       >
         <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="mb-5 flex justify-center md:mb-6"
+        >
+          <BrandMark priority className="h-24 w-24 md:h-32 md:w-32" />
+        </motion.div>
+
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-2 text-sm shadow-sm backdrop-blur-sm"
         >
           <Sparkles size={16} className="text-[var(--accent)]" />
