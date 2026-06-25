@@ -22,6 +22,13 @@ export const apps: AppItem[] = [
     type: "mobile",
     description: "A mobile application for tracking and managing shift POM.",
   },
+  {
+    name: "Paiyu",
+    image: "/images/rims.svg",
+    url: "https://paiyu.maloka.app",
+    type: "web",
+    description: "A web application by Maloka.",
+  },
 ];
 
 export const APP_COUNT = apps.length;
